@@ -1808,7 +1808,7 @@ export class AreaCardPlus
         position: absolute;
         top: 16px;
         left: 16px;
-        color: var(--primary-color);
+        color: white;
         z-index: 1;
         pointer-events: none;
       }
@@ -1917,24 +1917,26 @@ export class AreaCardPlus
         align-items: center;
         gap: 5px;
         background: none;
-        border: solid 0.025rem rgba(var(--rgb-primary-text-color), 0.15);
+        border: solid 0.025rem rgba(255, 255, 255, 0.3);
         padding: 1px;
         border-radius: 5px;
         --mdc-icon-size: 20px;
+        color: white;
       }
       .icon-with-count > ha-state-icon,
       .icon-with-count > span {
         pointer-events: none;
+        color: white;
       }
 
       .toggle-on {
-        color: var(--primary-text-color);
+        color: white;
       }
       .toggle-off {
-        color: var(--secondary-text-color) !important;
+        color: rgba(255, 255, 255, 0.7) !important;
       }
       .off {
-        color: var(--secondary-text-color);
+        color: rgba(255, 255, 255, 0.7);
       }
       .navigate {
         cursor: pointer;

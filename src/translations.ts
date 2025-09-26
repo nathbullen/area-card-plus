@@ -64,10 +64,6 @@ export function computeLabelCallback(
       );
     case "v2_color":
       return hass!.localize(`ui.panel.lovelace.editor.card.tile.color`);
-    case "use_light_color":
-      return "Use Light Color from Room";
-    case "light_color_entities":
-      return "Specific Light Entities (optional)";
     case "css":
       return "CSS";
     case "domain_css":
