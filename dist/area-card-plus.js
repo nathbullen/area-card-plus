@@ -3251,7 +3251,7 @@ let te = class extends ws(oe) {
         color: rgba(255, 255, 255, 0.7) !important;
       }
       .off {
-        color: rgba(255, 255, 255, 0.7);
+        color: var(--secondary-text-color);
       }
       .navigate {
         cursor: pointer;
