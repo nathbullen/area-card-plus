@@ -1620,11 +1620,13 @@ export class AreaCardPlus
       (entity) =>
         !UNAVAILABLE_STATES.includes(entity.state) &&
         !STATES_OFF.includes(entity.state) &&
-        lightSupportsFavoriteColors(entity as any)
+        (lightSupportsFavoriteColors(entity as any) || 
+         (entity.state === "on" && !lightSupportsFavoriteColors(entity as any)))
     );
 
     if (activeLightEntities.length === 0) {
-      return null;
+      // Return fallback color when no lights are on
+      return "#363636";
     }
 
     // Calculate average RGB color from all active light entities
@@ -1644,7 +1646,8 @@ export class AreaCardPlus
     }
 
     if (validColors === 0) {
-      return null;
+      // Return fallback color when no valid colors found
+      return "#363636";
     }
 
     const avgR = Math.round(totalR / validColors);
@@ -1697,6 +1700,11 @@ export class AreaCardPlus
       // Convert Mireds to Kelvin (Kelvin = 1000000 / Mireds)
       const kelvin = 1000000 / attrs.color_temp;
       return this._colorTempToRgb(kelvin);
+    }
+
+    // For fixed white lights that are on, return a warm white color
+    if (entity.state === "on" && !lightSupportsFavoriteColors(entity)) {
+      return [255, 248, 240]; // Warm white RGB
     }
 
     return null;
