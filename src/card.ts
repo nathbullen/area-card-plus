@@ -1616,6 +1616,11 @@ export class AreaCardPlus
       lightEntities = entitiesByDomain.light || [];
     }
 
+    // If no lights at all in the room, return fallback color
+    if (lightEntities.length === 0) {
+      return "#363636";
+    }
+
     const activeLightEntities = lightEntities.filter(
       (entity) =>
         !UNAVAILABLE_STATES.includes(entity.state) &&
@@ -1702,9 +1707,9 @@ export class AreaCardPlus
       return this._colorTempToRgb(kelvin);
     }
 
-    // For fixed white lights that are on, return a warm white color
+    // For fixed white lights that are on, return a warm orange color
     if (entity.state === "on" && !lightSupportsFavoriteColors(entity)) {
-      return [255, 248, 240]; // Warm white RGB
+      return [255, 160, 73]; // #FFA049 RGB
     }
 
     return null;

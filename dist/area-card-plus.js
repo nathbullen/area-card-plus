@@ -3054,6 +3054,8 @@ let te = class extends xs(oe) {
         this.hass.states
       ).light || [];
     }
+    if (t.length === 0)
+      return "#363636";
     const e = t.filter(
       (l) => !ye.includes(l.state) && !ee.includes(l.state) && (yt(l) || l.state === "on" && !yt(l))
     );
@@ -3090,7 +3092,7 @@ let te = class extends xs(oe) {
       const s = 1e6 / i.color_temp;
       return this._colorTempToRgb(s);
     }
-    return t.state === "on" && !yt(t) ? [255, 248, 240] : null;
+    return t.state === "on" && !yt(t) ? [255, 160, 73] : null;
   }
   _hsToRgb(t, e) {
     const i = e, s = i * (1 - Math.abs(t / 60 % 2 - 1)), o = 1 - i;
