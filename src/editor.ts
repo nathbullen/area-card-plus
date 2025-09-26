@@ -128,6 +128,21 @@ export class AreaCardPlusEditor
             ...(designVersion === "V2"
               ? ([
                   {
+                    name: "use_light_color",
+                    selector: { boolean: {} },
+                  },
+                  {
+                    name: "light_color_entities",
+                    selector: {
+                      entity: {
+                        multiple: true,
+                        filter: {
+                          domain: ["light"],
+                        },
+                      },
+                    },
+                  },
+                  {
                     name: "v2_color",
                     selector: {
                       color_rgb: {

@@ -19,6 +19,7 @@ import {
   DEVICE_CLASSES,
   DOMAIN_ICONS,
 } from "./helpers";
+import { getLightCurrentModeRgbColor, lightSupportsColorMode, LightColorMode, lightSupportsColor } from "./ha/data/light";
 import "./popup-dialog";
 import parseAspectRatio from "./ha/common/util/parse-aspect-ratio";
 import {
@@ -817,12 +818,15 @@ export class AreaCardPlus
       if (val) rowSize = Number(val.trim()) || 3;
     } catch (e) {}
 
-    const designStyles = isV2Design ? { background: v2Color } : {};
+    const lightColor = this._getLightColorFromArea();
+    const effectiveV2Color = lightColor || v2Color;
+    
+    const designStyles = isV2Design ? { background: effectiveV2Color } : {};
     const iconContainerStyles =
       isV2Design && rowSize === 1
         ? {}
         : isV2Design
-        ? { background: v2Color }
+        ? { background: effectiveV2Color }
         : {};
 
     const ignoreAspectRatio = this.layout === "grid";
@@ -1581,6 +1585,199 @@ export class AreaCardPlus
     const icon = this._getIcon(domain, on, deviceClass);
     this._iconCache.set(key, icon);
     return icon;
+  }
+
+  private _getLightColorFromArea(): string | null {
+    if (!this._config?.use_light_color || !this.hass) {
+      return null;
+    }
+
+    let lightEntities: HassEntity[] = [];
+
+    // If specific entities are configured, use those
+    if (this._config.light_color_entities && this._config.light_color_entities.length > 0) {
+      lightEntities = this._config.light_color_entities
+        .map((entityId: string) => this.hass.states[entityId])
+        .filter((entity: HassEntity | undefined) => entity && entity.entity_id.startsWith('light.'));
+    } else {
+      // Otherwise, use all lights in the area
+      if (!this._entities) {
+        return null;
+      }
+
+      const entitiesByDomain = this._entitiesByDomain(
+        this._config.area,
+        this._devicesInArea(this._config.area, this._devices!),
+        this._entities,
+        this._deviceClasses,
+        this.hass.states
+      );
+
+      lightEntities = entitiesByDomain.light || [];
+    }
+
+    const activeLightEntities = lightEntities.filter(
+      (entity) =>
+        !UNAVAILABLE_STATES.includes(entity.state) &&
+        !STATES_OFF.includes(entity.state) &&
+        lightSupportsColor(entity as any)
+    );
+
+    if (activeLightEntities.length === 0) {
+      return null;
+    }
+
+    // Calculate average RGB color from all active light entities
+    let totalR = 0;
+    let totalG = 0;
+    let totalB = 0;
+    let validColors = 0;
+
+    for (const entity of activeLightEntities) {
+      const rgbColor = this._extractRgbFromLight(entity as any);
+      if (rgbColor && rgbColor.length >= 3) {
+        totalR += rgbColor[0];
+        totalG += rgbColor[1];
+        totalB += rgbColor[2];
+        validColors++;
+      }
+    }
+
+    if (validColors === 0) {
+      return null;
+    }
+
+    const avgR = Math.round(totalR / validColors);
+    const avgG = Math.round(totalG / validColors);
+    const avgB = Math.round(totalB / validColors);
+
+    return `rgb(${avgR}, ${avgG}, ${avgB})`;
+  }
+
+  private _extractRgbFromLight(entity: any): number[] | null {
+    // Try to get RGB color using the built-in function first
+    const rgbColor = getLightCurrentModeRgbColor(entity);
+    if (rgbColor && rgbColor.length >= 3) {
+      return rgbColor;
+    }
+
+    // Fallback: try to extract from different color modes
+    const attrs = entity.attributes;
+    
+    // Try RGB color directly
+    if (attrs.rgb_color && attrs.rgb_color.length >= 3) {
+      return attrs.rgb_color;
+    }
+
+    // Try RGBW color (use first 3 components)
+    if (attrs.rgbw_color && attrs.rgbw_color.length >= 3) {
+      return attrs.rgbw_color.slice(0, 3);
+    }
+
+    // Try RGBWW color (use first 3 components)
+    if (attrs.rgbww_color && attrs.rgbww_color.length >= 3) {
+      return attrs.rgbww_color.slice(0, 3);
+    }
+
+    // Try HS color conversion
+    if (attrs.hs_color && attrs.hs_color.length >= 2) {
+      return this._hsToRgb(attrs.hs_color[0], attrs.hs_color[1]);
+    }
+
+    // Try XY color conversion
+    if (attrs.xy_color && attrs.xy_color.length >= 2) {
+      return this._xyToRgb(attrs.xy_color[0], attrs.xy_color[1]);
+    }
+
+    // Try color temperature
+    if (attrs.color_temp) {
+      return this._colorTempToRgb(attrs.color_temp);
+    }
+
+    return null;
+  }
+
+  private _hsToRgb(h: number, s: number): number[] {
+    // Convert HS to RGB
+    const c = s;
+    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+    const m = 1 - c;
+    
+    let r = 0, g = 0, b = 0;
+    
+    if (h >= 0 && h < 60) {
+      r = c; g = x; b = 0;
+    } else if (h >= 60 && h < 120) {
+      r = x; g = c; b = 0;
+    } else if (h >= 120 && h < 180) {
+      r = 0; g = c; b = x;
+    } else if (h >= 180 && h < 240) {
+      r = 0; g = x; b = c;
+    } else if (h >= 240 && h < 300) {
+      r = x; g = 0; b = c;
+    } else if (h >= 300 && h < 360) {
+      r = c; g = 0; b = x;
+    }
+    
+    return [
+      Math.round((r + m) * 255),
+      Math.round((g + m) * 255),
+      Math.round((b + m) * 255)
+    ];
+  }
+
+  private _xyToRgb(x: number, y: number): number[] {
+    // Convert XY to RGB using the standard conversion
+    const z = 1.0 - x - y;
+    const Y = 1.0;
+    const X = (Y / y) * x;
+    const Z = (Y / y) * z;
+    
+    // Convert to RGB
+    let r = X * 1.656492 - Y * 0.354851 - Z * 0.255038;
+    let g = -X * 0.707196 + Y * 1.655397 + Z * 0.036152;
+    let b = X * 0.051713 - Y * 0.121364 + Z * 1.011530;
+    
+    // Apply gamma correction
+    r = r <= 0.0031308 ? 12.92 * r : (1.0 + 0.055) * Math.pow(r, 1.0 / 2.4) - 0.055;
+    g = g <= 0.0031308 ? 12.92 * g : (1.0 + 0.055) * Math.pow(g, 1.0 / 2.4) - 0.055;
+    b = b <= 0.0031308 ? 12.92 * b : (1.0 + 0.055) * Math.pow(b, 1.0 / 2.4) - 0.055;
+    
+    // Clamp values
+    r = Math.max(0, Math.min(1, r));
+    g = Math.max(0, Math.min(1, g));
+    b = Math.max(0, Math.min(1, b));
+    
+    return [
+      Math.round(r * 255),
+      Math.round(g * 255),
+      Math.round(b * 255)
+    ];
+  }
+
+  private _colorTempToRgb(colorTemp: number): number[] {
+    // Convert color temperature to RGB
+    const temp = colorTemp / 100;
+    
+    let r, g, b;
+    
+    if (temp <= 66) {
+      r = 255;
+      g = Math.max(0, Math.min(255, 99.4708025861 * Math.log(temp) - 161.1195681661));
+    } else {
+      r = Math.max(0, Math.min(255, 329.698727446 * Math.pow(temp - 60, -0.1332047592)));
+      g = Math.max(0, Math.min(255, 288.1221695283 * Math.pow(temp - 60, -0.0755148492)));
+    }
+    
+    if (temp >= 66) {
+      b = 255;
+    } else if (temp <= 19) {
+      b = 0;
+    } else {
+      b = Math.max(0, Math.min(255, 138.5177312231 * Math.log(temp - 10) - 305.0447927307));
+    }
+    
+    return [Math.round(r), Math.round(g), Math.round(b)];
   }
 
   static get styles() {
