@@ -3072,27 +3072,29 @@ let te = class extends xs(oe) {
     return `rgb(${a}, ${r}, ${c})`;
   }
   _extractRgbFromLight(t) {
-    const e = is(t);
-    if (e && e.length >= 3)
-      return e;
-    const i = t.attributes;
-    if (i.rgb_color && i.rgb_color.length >= 3)
-      return i.rgb_color;
-    if (i.rgbw_color && i.rgbw_color.length >= 3)
-      return i.rgbw_color.slice(0, 3);
-    if (i.rgbww_color && i.rgbww_color.length >= 3)
-      return i.rgbww_color.slice(0, 3);
-    if (i.hs_color && i.hs_color.length >= 2)
-      return this._hsToRgb(i.hs_color[0], i.hs_color[1]);
-    if (i.xy_color && i.xy_color.length >= 2)
-      return this._xyToRgb(i.xy_color[0], i.xy_color[1]);
-    if (i.color_temp_kelvin)
-      return this._colorTempToRgb(i.color_temp_kelvin);
-    if (i.color_temp) {
-      const s = 1e6 / i.color_temp;
+    const e = t.attributes;
+    if (t.state === "on" && !yt(t))
+      return [255, 160, 73];
+    const i = is(t);
+    if (i && i.length >= 3)
+      return i;
+    if (e.rgb_color && e.rgb_color.length >= 3)
+      return e.rgb_color;
+    if (e.rgbw_color && e.rgbw_color.length >= 3)
+      return e.rgbw_color.slice(0, 3);
+    if (e.rgbww_color && e.rgbww_color.length >= 3)
+      return e.rgbww_color.slice(0, 3);
+    if (e.hs_color && e.hs_color.length >= 2)
+      return this._hsToRgb(e.hs_color[0], e.hs_color[1]);
+    if (e.xy_color && e.xy_color.length >= 2)
+      return this._xyToRgb(e.xy_color[0], e.xy_color[1]);
+    if (e.color_temp_kelvin)
+      return this._colorTempToRgb(e.color_temp_kelvin);
+    if (e.color_temp) {
+      const s = 1e6 / e.color_temp;
       return this._colorTempToRgb(s);
     }
-    return t.state === "on" && !yt(t) ? [255, 160, 73] : null;
+    return null;
   }
   _hsToRgb(t, e) {
     const i = e, s = i * (1 - Math.abs(t / 60 % 2 - 1)), o = 1 - i;

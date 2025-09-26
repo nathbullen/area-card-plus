@@ -1663,14 +1663,20 @@ export class AreaCardPlus
   }
 
   private _extractRgbFromLight(entity: any): number[] | null {
-    // Try to get RGB color using the built-in function first
+    const attrs = entity.attributes;
+    
+    // Check for fixed white lights first (before other color checks)
+    if (entity.state === "on" && !lightSupportsFavoriteColors(entity)) {
+      return [255, 160, 73]; // #FFA049 RGB
+    }
+
+    // Try to get RGB color using the built-in function
     const rgbColor = getLightCurrentModeRgbColor(entity);
     if (rgbColor && rgbColor.length >= 3) {
       return rgbColor;
     }
 
     // Fallback: try to extract from different color modes
-    const attrs = entity.attributes;
     
     // Try RGB color directly
     if (attrs.rgb_color && attrs.rgb_color.length >= 3) {
@@ -1705,11 +1711,6 @@ export class AreaCardPlus
       // Convert Mireds to Kelvin (Kelvin = 1000000 / Mireds)
       const kelvin = 1000000 / attrs.color_temp;
       return this._colorTempToRgb(kelvin);
-    }
-
-    // For fixed white lights that are on, return a warm orange color
-    if (entity.state === "on" && !lightSupportsFavoriteColors(entity)) {
-      return [255, 160, 73]; // #FFA049 RGB
     }
 
     return null;
