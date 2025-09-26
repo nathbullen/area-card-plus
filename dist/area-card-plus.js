@@ -3107,11 +3107,11 @@ let te = class extends ws(oe) {
       }
       .sensors {
         --mdc-icon-size: 20px;
-        color: var(--primary-text-color);
+        color: var(--primary-text-color) !important;
       }
       .sensor-value {
         vertical-align: middle;
-        color: var(--primary-text-color);
+        color: var(--primary-text-color) !important;
       }
       .sensor-row {
         display: flex;
@@ -3236,7 +3236,6 @@ let te = class extends ws(oe) {
         padding: 1px;
         border-radius: 5px;
         --mdc-icon-size: 20px;
-        color: white;
       }
       .icon-with-count > ha-state-icon,
       .icon-with-count > span {
@@ -3265,7 +3264,7 @@ let te = class extends ws(oe) {
       }
       .text-medium {
         font-size: 1em;
-        color: var(--primary-text-color);
+        color: var(--primary-text-color) !important;
       }
       .text-large {
         font-size: 1.3em;
