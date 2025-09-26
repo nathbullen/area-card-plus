@@ -19,7 +19,7 @@ import {
   DEVICE_CLASSES,
   DOMAIN_ICONS,
 } from "./helpers";
-import { getLightCurrentModeRgbColor, lightSupportsColorMode, LightColorMode, lightSupportsColor } from "./ha/data/light";
+import { getLightCurrentModeRgbColor, lightSupportsColorMode, LightColorMode, lightSupportsColor, lightSupportsFavoriteColors } from "./ha/data/light";
 import "./popup-dialog";
 import parseAspectRatio from "./ha/common/util/parse-aspect-ratio";
 import {
@@ -1620,7 +1620,7 @@ export class AreaCardPlus
       (entity) =>
         !UNAVAILABLE_STATES.includes(entity.state) &&
         !STATES_OFF.includes(entity.state) &&
-        lightSupportsColor(entity as any)
+        lightSupportsFavoriteColors(entity as any)
     );
 
     if (activeLightEntities.length === 0) {
@@ -1690,8 +1690,13 @@ export class AreaCardPlus
     }
 
     // Try color temperature
-    if (attrs.color_temp) {
-      return this._colorTempToRgb(attrs.color_temp);
+    if (attrs.color_temp_kelvin) {
+      // Use Kelvin directly if available
+      return this._colorTempToRgb(attrs.color_temp_kelvin);
+    } else if (attrs.color_temp) {
+      // Convert Mireds to Kelvin (Kelvin = 1000000 / Mireds)
+      const kelvin = 1000000 / attrs.color_temp;
+      return this._colorTempToRgb(kelvin);
     }
 
     return null;
@@ -1756,25 +1761,41 @@ export class AreaCardPlus
   }
 
   private _colorTempToRgb(colorTemp: number): number[] {
-    // Convert color temperature to RGB
-    const temp = colorTemp / 100;
+    // Convert color temperature (Kelvin) to RGB using the Planckian locus
+    // Clamp temperature to reasonable range (1000K - 40000K)
+    const temp = Math.max(1000, Math.min(40000, colorTemp));
     
     let r, g, b;
     
-    if (temp <= 66) {
+    // Red calculation
+    if (temp <= 6600) {
       r = 255;
-      g = Math.max(0, Math.min(255, 99.4708025861 * Math.log(temp) - 161.1195681661));
     } else {
-      r = Math.max(0, Math.min(255, 329.698727446 * Math.pow(temp - 60, -0.1332047592)));
-      g = Math.max(0, Math.min(255, 288.1221695283 * Math.pow(temp - 60, -0.0755148492)));
+      r = temp - 60;
+      r = 329.698727446 * Math.pow(r, -0.1332047592);
+      r = Math.max(0, Math.min(255, r));
     }
     
-    if (temp >= 66) {
+    // Green calculation
+    if (temp <= 6600) {
+      g = temp;
+      g = 99.4708025861 * Math.log(g) - 161.1195681661;
+      g = Math.max(0, Math.min(255, g));
+    } else {
+      g = temp - 60;
+      g = 288.1221695283 * Math.pow(g, -0.0755148492);
+      g = Math.max(0, Math.min(255, g));
+    }
+    
+    // Blue calculation
+    if (temp >= 6600) {
       b = 255;
-    } else if (temp <= 19) {
+    } else if (temp <= 1900) {
       b = 0;
     } else {
-      b = Math.max(0, Math.min(255, 138.5177312231 * Math.log(temp - 10) - 305.0447927307));
+      b = temp - 10;
+      b = 138.5177312231 * Math.log(b) - 305.0447927307;
+      b = Math.max(0, Math.min(255, b));
     }
     
     return [Math.round(r), Math.round(g), Math.round(b)];

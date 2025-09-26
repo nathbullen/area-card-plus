@@ -946,12 +946,19 @@ const nt = ["sensor"], at = ["binary_sensor"], rt = ["cover"], $t = ["climate"],
   "rgbw",
   "rgbww"
   /* RGBWW */
-], Qi = (t) => {
+], Qi = (t, e) => {
+  var i;
+  return ((i = t.attributes.supported_color_modes) == null ? void 0 : i.includes(e)) || !1;
+}, es = (t) => {
   var e;
   return ((e = t.attributes.supported_color_modes) == null ? void 0 : e.some(
     (i) => Yi.includes(i)
   )) || !1;
-}, es = (t) => t.attributes.color_mode === "rgbww" ? t.attributes.rgbww_color : t.attributes.color_mode === "rgbw" ? t.attributes.rgbw_color : t.attributes.rgb_color, ee = [
+}, ts = (t) => es(t) || Qi(
+  t,
+  "color_temp"
+  /* COLOR_TEMP */
+), is = (t) => t.attributes.color_mode === "rgbww" ? t.attributes.rgbww_color : t.attributes.color_mode === "rgbw" ? t.attributes.rgbw_color : t.attributes.rgb_color, ee = [
   "closed",
   "locked",
   "off",
@@ -962,7 +969,7 @@ const nt = ["sensor"], at = ["binary_sensor"], rt = ["cover"], $t = ["climate"],
   "auto",
   "not_home",
   "disarmed"
-], ts = (t, e, i, s, o) => {
+], ss = (t, e, i, s, o) => {
   var h, m, u, f, v;
   const n = i || void 0, a = (e == null ? void 0 : e.darkMode) || !1;
   t.__themes || (t.__themes = { cacheKey: null, keys: /* @__PURE__ */ new Set() });
@@ -1015,7 +1022,7 @@ const nt = ["sensor"], at = ["binary_sensor"], rt = ["cover"], $t = ["climate"],
   return o.detail = i, t.dispatchEvent(o), o;
 }, q = (t) => t.substr(0, t.indexOf("."));
 var Oe = /* @__PURE__ */ ((t) => (t.language = "language", t.system = "system", t.comma_decimal = "comma_decimal", t.decimal_comma = "decimal_comma", t.space_comma = "space_comma", t.none = "none", t))(Oe || {});
-const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.attributes), os = (t) => !!t.unit_of_measurement || !!t.state_class, ns = (t) => {
+const os = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ns = (t) => as(t.attributes), as = (t) => !!t.unit_of_measurement || !!t.state_class, rs = (t) => {
   switch (t.number_format) {
     case Oe.comma_decimal:
       return ["en-US", "en"];
@@ -1032,7 +1039,7 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
       return t.language;
   }
 }, Xt = (t, e, i) => {
-  const s = e ? ns(e) : void 0;
+  const s = e ? rs(e) : void 0;
   if (Number.isNaN = Number.isNaN || function o(n) {
     return typeof n == "number" && o(n);
   }, (e == null ? void 0 : e.number_format) !== Oe.none && !Number.isNaN(Number(t)) && Intl)
@@ -1047,7 +1054,7 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
         Jt(t, i)
       ).format(Number(t));
     }
-  return typeof t == "string" ? t : `${is(t, i == null ? void 0 : i.maximumFractionDigits).toString()}${(i == null ? void 0 : i.style) === "currency" ? ` ${i.currency}` : ""}`;
+  return typeof t == "string" ? t : `${os(t, i == null ? void 0 : i.maximumFractionDigits).toString()}${(i == null ? void 0 : i.style) === "currency" ? ` ${i.currency}` : ""}`;
 }, Jt = (t, e) => {
   const i = {
     maximumFractionDigits: 2,
@@ -1060,11 +1067,11 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
     i.minimumFractionDigits = s, i.maximumFractionDigits = s;
   }
   return i;
-}, as = E(
+}, cs = E(
   (t) => new Intl.Collator(t)
-), rs = E(
+), ls = E(
   (t) => new Intl.Collator(t, { sensitivity: "accent" })
-), di = (t, e) => t < e ? -1 : t > e ? 1 : 0, cs = (t, e, i = void 0) => Intl != null && Intl.Collator ? as(i).compare(t, e) : di(t, e), hi = (t, e, i = void 0) => Intl != null && Intl.Collator ? rs(i).compare(t, e) : di(t.toLowerCase(), e.toLowerCase()), ls = (t) => {
+), di = (t, e) => t < e ? -1 : t > e ? 1 : 0, ds = (t, e, i = void 0) => Intl != null && Intl.Collator ? cs(i).compare(t, e) : di(t, e), hi = (t, e, i = void 0) => Intl != null && Intl.Collator ? ls(i).compare(t, e) : di(t.toLowerCase(), e.toLowerCase()), hs = (t) => {
   switch (t.language) {
     case "cs":
     case "de":
@@ -1076,11 +1083,11 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
     default:
       return "";
   }
-}, Yt = (t, e) => t === "°" ? "" : e && t === "%" ? ls(e) : " ", ds = async (t, e) => new Promise((i) => {
+}, Yt = (t, e) => t === "°" ? "" : e && t === "%" ? hs(e) : " ", us = async (t, e) => new Promise((i) => {
   const s = e(t, (o) => {
     s(), i(o);
   });
-}), ui = "unavailable", mi = "unknown", hs = (t) => {
+}), ui = "unavailable", mi = "unknown", ms = (t) => {
   let e = [];
   function i(o) {
     let n = [];
@@ -1144,10 +1151,10 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
     //  */
     // unsubscribe,
   };
-}, us = 5e3, ms = (t, e, i, s, o = { unsubGrace: !0 }) => {
+}, _s = 5e3, ps = (t, e, i, s, o = { unsubGrace: !0 }) => {
   if (t[e])
     return t[e];
-  let n = 0, a, r, c = hs();
+  let n = 0, a, r, c = ms();
   const d = () => {
     if (!i)
       throw new Error("Collection does not support refresh");
@@ -1166,7 +1173,7 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
       v();
     }), c.clearState(), t.removeEventListener("ready", d), t.removeEventListener("disconnected", f);
   }, u = () => {
-    r = setTimeout(m, us);
+    r = setTimeout(m, _s);
   }, f = () => {
     r && (clearTimeout(r), m());
   };
@@ -1183,7 +1190,7 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
       };
     }
   }, t[e];
-}, Ht = (t, e, i, s, o) => ms(s, t, e, i).subscribe(o), Lt = (t, e, i = !1) => {
+}, Ht = (t, e, i, s, o) => ps(s, t, e, i).subscribe(o), Lt = (t, e, i = !1) => {
   let s;
   const o = (...n) => {
     const a = () => {
@@ -1196,7 +1203,7 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
   }, o;
 }, _i = (t) => t.sendMessagePromise({
   type: "config/entity_registry/list"
-}), _s = (t, e) => t.subscribeEvents(
+}), fs = (t, e) => t.subscribeEvents(
   Lt(
     () => _i(t).then(
       (i) => e.setState(i, !0)
@@ -1205,10 +1212,10 @@ const is = (t, e = 2) => Math.round(t * 10 ** e) / 10 ** e, ss = (t) => os(t.att
     !0
   ),
   "entity_registry_updated"
-), ps = (t, e) => Ht(
+), gs = (t, e) => Ht(
   "_entityRegistry",
   _i,
-  _s,
+  fs,
   t,
   e
 );
@@ -1229,13 +1236,13 @@ E(
   }
 );
 let it;
-const fs = async (t) => it || (it = t.callWS({
+const vs = async (t) => it || (it = t.callWS({
   type: "sensor/numeric_device_classes"
 }), it), pi = (t) => t.sendMessagePromise({
   type: "config/area_registry/list"
 }).then(
-  (e) => e.sort((i, s) => cs(i.name, s.name))
-), gs = (t, e) => t.subscribeEvents(
+  (e) => e.sort((i, s) => ds(i.name, s.name))
+), ys = (t, e) => t.subscribeEvents(
   Lt(
     () => pi(t).then(
       (i) => e.setState(i, !0)
@@ -1247,12 +1254,12 @@ const fs = async (t) => it || (it = t.callWS({
 ), Qt = (t, e) => Ht(
   "_areaRegistry",
   pi,
-  gs,
+  ys,
   t,
   e
 ), fi = (t) => t.sendMessagePromise({
   type: "config/device_registry/list"
-}), vs = (t, e) => t.subscribeEvents(
+}), bs = (t, e) => t.subscribeEvents(
   Lt(
     () => fi(t).then(
       (i) => e.setState(i, !0)
@@ -1261,19 +1268,19 @@ const fs = async (t) => it || (it = t.callWS({
     !0
   ),
   "device_registry_updated"
-), ys = (t, e) => Ht(
+), $s = (t, e) => Ht(
   "_dr",
   fi,
-  vs,
+  bs,
   t,
   e
 );
-var bs = Object.defineProperty, $s = (t, e, i, s) => {
+var ws = Object.defineProperty, Cs = (t, e, i, s) => {
   for (var o = void 0, n = t.length - 1, a; n >= 0; n--)
     (a = t[n]) && (o = a(e, i, o) || o);
-  return o && bs(e, i, o), o;
+  return o && ws(e, i, o), o;
 };
-const ws = (t) => {
+const xs = (t) => {
   class e extends t {
     connectedCallback() {
       super.connectedCallback(), this._checkSubscribed();
@@ -1310,7 +1317,7 @@ const ws = (t) => {
       ) || (this.__unsubs = this.hassSubscribe());
     }
   }
-  return $s([
+  return Cs([
     B({ attribute: !1 })
   ], e.prototype, "hass"), e;
 }, ct = (t, e) => {
@@ -1376,7 +1383,7 @@ const ws = (t) => {
   }
   return t !== t && e !== e;
 };
-class Cs extends HTMLElement {
+class As extends HTMLElement {
   constructor() {
     super(...arguments), this.holdTime = 500, this.held = !1, this.cancelled = !1;
   }
@@ -1423,20 +1430,20 @@ class Cs extends HTMLElement {
     }), e.addEventListener("click", e.actionHandler.end), e.addEventListener("keydown", e.actionHandler.handleKeyDown)));
   }
 }
-customElements.define("action-handler-area-card", Cs);
-const xs = () => {
+customElements.define("action-handler-area-card", As);
+const Es = () => {
   const t = document.body;
   if (t.querySelector("action-handler-area-card"))
     return t.querySelector("action-handler-area-card");
   const e = document.createElement("action-handler-area-card");
   return t.appendChild(e), e;
-}, As = (t, e) => {
-  const i = xs();
+}, Ss = (t, e) => {
+  const i = Es();
   i && i.bind(t, e);
 }, le = ut(
   class extends mt {
     update(t, [e]) {
-      return As(t.element, e), ne;
+      return Ss(t.element, e), ne;
     }
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     render(t) {
@@ -1448,7 +1455,7 @@ const xs = () => {
 function V(t) {
   return t !== void 0 && t.action !== "none";
 }
-var Es = "M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z", Ss = "M4 20H16V22H4C2.9 22 2 21.1 2 20V7H4M22 4V16C22 17.1 21.1 18 20 18H8C6.9 18 6 17.1 6 16V4C6 2.9 6.9 2 8 2H20C21.1 2 22 2.9 22 4M12 8H10V14H12M15 6H13V14H15M18 11H16V14H18Z", Pt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", Os = "M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L6.04,7.5L12,10.85L17.96,7.5L12,4.15Z", ei = "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z", bt = "M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z", Ds = "M19,20H17V11H7V20H5V9L12,5L19,9V20M8,12H16V14H8V12M8,15H16V17H8V15M16,18V20H8V18H16Z", Ms = "M13 5C15.21 5 17 6.79 17 9C17 10.5 16.2 11.77 15 12.46V11.24C15.61 10.69 16 9.89 16 9C16 7.34 14.66 6 13 6S10 7.34 10 9C10 9.89 10.39 10.69 11 11.24V12.46C9.8 11.77 9 10.5 9 9C9 6.79 10.79 5 13 5M20 20.5C19.97 21.32 19.32 21.97 18.5 22H13C12.62 22 12.26 21.85 12 21.57L8 17.37L8.74 16.6C8.93 16.39 9.2 16.28 9.5 16.28H9.7L12 18V9C12 8.45 12.45 8 13 8S14 8.45 14 9V13.47L15.21 13.6L19.15 15.79C19.68 16.03 20 16.56 20 17.14V20.5M20 2H4C2.9 2 2 2.9 2 4V12C2 13.11 2.9 14 4 14H8V12L4 12L4 4H20L20 12H18V14H20V13.96L20.04 14C21.13 14 22 13.09 22 12V4C22 2.9 21.11 2 20 2Z", gi = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", ks = "M2,5V19H8V5H2M9,5V10H15V5H9M16,5V14H22V5H16M9,11V19H15V11H9M16,15V19H22V15H16Z";
+var Os = "M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z", Ds = "M4 20H16V22H4C2.9 22 2 21.1 2 20V7H4M22 4V16C22 17.1 21.1 18 20 18H8C6.9 18 6 17.1 6 16V4C6 2.9 6.9 2 8 2H20C21.1 2 22 2.9 22 4M12 8H10V14H12M15 6H13V14H15M18 11H16V14H18Z", Pt = "M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z", Ms = "M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L6.04,7.5L12,10.85L17.96,7.5L12,4.15Z", ei = "M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z", bt = "M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z", ks = "M19,20H17V11H7V20H5V9L12,5L19,9V20M8,12H16V14H8V12M8,15H16V17H8V15M16,18V20H8V18H16Z", zs = "M13 5C15.21 5 17 6.79 17 9C17 10.5 16.2 11.77 15 12.46V11.24C15.61 10.69 16 9.89 16 9C16 7.34 14.66 6 13 6S10 7.34 10 9C10 9.89 10.39 10.69 11 11.24V12.46C9.8 11.77 9 10.5 9 9C9 6.79 10.79 5 13 5M20 20.5C19.97 21.32 19.32 21.97 18.5 22H13C12.62 22 12.26 21.85 12 21.57L8 17.37L8.74 16.6C8.93 16.39 9.2 16.28 9.5 16.28H9.7L12 18V9C12 8.45 12.45 8 13 8S14 8.45 14 9V13.47L15.21 13.6L19.15 15.79C19.68 16.03 20 16.56 20 17.14V20.5M20 2H4C2.9 2 2 2.9 2 4V12C2 13.11 2.9 14 4 14H8V12L4 12L4 4H20L20 12H18V14H20V13.96L20.04 14C21.13 14 22 13.09 22 12V4C22 2.9 21.11 2 20 2Z", gi = "M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z", Hs = "M2,5V19H8V5H2M9,5V10H15V5H9M16,5V14H22V5H16M9,11V19H15V11H9M16,15V19H22V15H16Z";
 function ti(t, e, i) {
   return t.localize(
     `component.${i}.entity_component._.state.${e}`
@@ -1552,12 +1559,12 @@ function vi(t, e) {
       );
   }
 }
-var zs = Object.defineProperty, fe = (t, e, i, s) => {
+var Ls = Object.defineProperty, fe = (t, e, i, s) => {
   for (var o = void 0, n = t.length - 1, a; n >= 0; n--)
     (a = t[n]) && (o = a(e, i, o) || o);
-  return o && zs(e, i, o), o;
+  return o && Ls(e, i, o), o;
 };
-const yi = [ui, mi], Hs = [yi, ee];
+const yi = [ui, mi], Ps = [yi, ee];
 var we;
 const ue = (we = class extends oe {
   constructor() {
@@ -1833,7 +1840,7 @@ const ue = (we = class extends oe {
     }), o;
   }
   _isActive(e) {
-    return !Hs.flat().includes(e.state);
+    return !Ps.flat().includes(e.state);
   }
   sortEntitiesForPopup(e) {
     var n, a;
@@ -2117,8 +2124,8 @@ fe([
 fe([
   U()
 ], ue.prototype, "selectedGroup");
-let Ls = ue;
-customElements.define("area-card-plus-popup", Ls);
+let Ts = ue;
+customElements.define("area-card-plus-popup", Ts);
 const st = (t) => {
   const e = parseFloat(t);
   if (isNaN(e))
@@ -2137,13 +2144,13 @@ function ii(t) {
   }
   return null;
 }
-var Ps = Object.defineProperty, Ts = Object.getOwnPropertyDescriptor, ae = (t, e, i, s) => {
-  for (var o = s > 1 ? void 0 : s ? Ts(e, i) : e, n = t.length - 1, a; n >= 0; n--)
+var Bs = Object.defineProperty, Is = Object.getOwnPropertyDescriptor, ae = (t, e, i, s) => {
+  for (var o = s > 1 ? void 0 : s ? Is(e, i) : e, n = t.length - 1, a; n >= 0; n--)
     (a = t[n]) && (o = (s ? a(e, i, o) : a(o)) || o);
-  return s && o && Ps(e, i, o), o;
+  return s && o && Bs(e, i, o), o;
 };
-const ye = [ui, mi], Bs = "16:5";
-let te = class extends ws(oe) {
+const ye = [ui, mi], Ns = "16:5";
+let te = class extends xs(oe) {
   constructor() {
     super(...arguments), this.selectedDomain = null, this.selectedDeviceClass = null, this.selectedGroup = null, this.layout = "grid", this._iconCache = /* @__PURE__ */ new Map(), this._styleCache = /* @__PURE__ */ new Map(), this._ratio = null, this._deviceClasses = wt, this._entitiesByDomain = E(
       (t, e, i, s, o) => {
@@ -2224,7 +2231,7 @@ let te = class extends ws(oe) {
   static async getStubConfig(t) {
     var s;
     const e = t.connection;
-    return { type: "custom:area-card-plus", area: ((s = (await ds(e, Qt))[0]) == null ? void 0 : s.area_id) || "" };
+    return { type: "custom:area-card-plus", area: ((s = (await us(e, Qt))[0]) == null ? void 0 : s.area_id) || "" };
   }
   showPopup(t, e, i) {
     t.dispatchEvent(
@@ -2300,7 +2307,7 @@ let te = class extends ws(oe) {
     if (!i || i.length === 0)
       return;
     let s;
-    const o = i.filter((a) => !ss(a) || isNaN(Number(a.state)) ? !1 : s ? a.attributes.unit_of_measurement === s : (s = a.attributes.unit_of_measurement, !0));
+    const o = i.filter((a) => !ns(a) || isNaN(Number(a.state)) ? !1 : s ? a.attributes.unit_of_measurement === s : (s = a.attributes.unit_of_measurement, !0));
     if (!o.length)
       return;
     const n = o.reduce(
@@ -2319,10 +2326,10 @@ let te = class extends ws(oe) {
       Qt(t, (e) => {
         this._areas = e;
       }),
-      ys(t, (e) => {
+      $s(t, (e) => {
         this._devices = e;
       }),
-      ps(t, (e) => {
+      gs(t, (e) => {
         this._entities = e;
       })
     ];
@@ -2332,7 +2339,7 @@ let te = class extends ws(oe) {
   }
   willUpdate(t) {
     var e, i;
-    (t.has("_config") || this._ratio === null) && (this._ratio = (e = this._config) != null && e.aspect_ratio ? ii((i = this._config) == null ? void 0 : i.aspect_ratio) : null, (this._ratio === null || this._ratio.w <= 0 || this._ratio.h <= 0) && (this._ratio = ii(Bs)));
+    (t.has("_config") || this._ratio === null) && (this._ratio = (e = this._config) != null && e.aspect_ratio ? ii((i = this._config) == null ? void 0 : i.aspect_ratio) : null, (this._ratio === null || this._ratio.w <= 0 || this._ratio.h <= 0) && (this._ratio = ii(Ns)));
   }
   getGridOptions() {
     return {
@@ -3001,7 +3008,7 @@ let te = class extends ws(oe) {
       }, 0);
     }
     const e = t.get("hass"), i = t.get("_config");
-    (t.has("hass") && (!e || e.themes !== this.hass.themes) || t.has("_config") && (!i || i.theme !== this._config.theme)) && ts(this, this.hass.themes, this._config.theme);
+    (t.has("hass") && (!e || e.themes !== this.hass.themes) || t.has("_config") && (!i || i.theme !== this._config.theme)) && ss(this, this.hass.themes, this._config.theme);
   }
   _showPopupForDomain(t, e) {
     this.selectedDeviceClass = e || null, this._openDomainPopup(t);
@@ -3048,7 +3055,7 @@ let te = class extends ws(oe) {
       ).light || [];
     }
     const e = t.filter(
-      (l) => !ye.includes(l.state) && !ee.includes(l.state) && Qi(l)
+      (l) => !ye.includes(l.state) && !ee.includes(l.state) && ts(l)
     );
     if (e.length === 0)
       return null;
@@ -3063,11 +3070,27 @@ let te = class extends ws(oe) {
     return `rgb(${a}, ${r}, ${c})`;
   }
   _extractRgbFromLight(t) {
-    const e = es(t);
+    const e = is(t);
     if (e && e.length >= 3)
       return e;
     const i = t.attributes;
-    return i.rgb_color && i.rgb_color.length >= 3 ? i.rgb_color : i.rgbw_color && i.rgbw_color.length >= 3 ? i.rgbw_color.slice(0, 3) : i.rgbww_color && i.rgbww_color.length >= 3 ? i.rgbww_color.slice(0, 3) : i.hs_color && i.hs_color.length >= 2 ? this._hsToRgb(i.hs_color[0], i.hs_color[1]) : i.xy_color && i.xy_color.length >= 2 ? this._xyToRgb(i.xy_color[0], i.xy_color[1]) : i.color_temp ? this._colorTempToRgb(i.color_temp) : null;
+    if (i.rgb_color && i.rgb_color.length >= 3)
+      return i.rgb_color;
+    if (i.rgbw_color && i.rgbw_color.length >= 3)
+      return i.rgbw_color.slice(0, 3);
+    if (i.rgbww_color && i.rgbww_color.length >= 3)
+      return i.rgbww_color.slice(0, 3);
+    if (i.hs_color && i.hs_color.length >= 2)
+      return this._hsToRgb(i.hs_color[0], i.hs_color[1]);
+    if (i.xy_color && i.xy_color.length >= 2)
+      return this._xyToRgb(i.xy_color[0], i.xy_color[1]);
+    if (i.color_temp_kelvin)
+      return this._colorTempToRgb(i.color_temp_kelvin);
+    if (i.color_temp) {
+      const s = 1e6 / i.color_temp;
+      return this._colorTempToRgb(s);
+    }
+    return null;
   }
   _hsToRgb(t, e) {
     const i = e, s = i * (1 - Math.abs(t / 60 % 2 - 1)), o = 1 - i;
@@ -3088,9 +3111,9 @@ let te = class extends ws(oe) {
     ];
   }
   _colorTempToRgb(t) {
-    const e = t / 100;
+    const e = Math.max(1e3, Math.min(4e4, t));
     let i, s, o;
-    return e <= 66 ? (i = 255, s = Math.max(0, Math.min(255, 99.4708025861 * Math.log(e) - 161.1195681661))) : (i = Math.max(0, Math.min(255, 329.698727446 * Math.pow(e - 60, -0.1332047592))), s = Math.max(0, Math.min(255, 288.1221695283 * Math.pow(e - 60, -0.0755148492)))), e >= 66 ? o = 255 : e <= 19 ? o = 0 : o = Math.max(0, Math.min(255, 138.5177312231 * Math.log(e - 10) - 305.0447927307)), [Math.round(i), Math.round(s), Math.round(o)];
+    return e <= 6600 ? i = 255 : (i = e - 60, i = 329.698727446 * Math.pow(i, -0.1332047592), i = Math.max(0, Math.min(255, i))), e <= 6600 ? (s = e, s = 99.4708025861 * Math.log(s) - 161.1195681661, s = Math.max(0, Math.min(255, s))) : (s = e - 60, s = 288.1221695283 * Math.pow(s, -0.0755148492), s = Math.max(0, Math.min(255, s))), e >= 6600 ? o = 255 : e <= 1900 ? o = 0 : (o = e - 10, o = 138.5177312231 * Math.log(o) - 305.0447927307, o = Math.max(0, Math.min(255, o))), [Math.round(i), Math.round(s), Math.round(o)];
   }
   static get styles() {
     return Me`
@@ -3378,10 +3401,10 @@ ae([
 te = ae([
   he("area-card-plus")
 ], te);
-var Is = Object.defineProperty, Ns = Object.getOwnPropertyDescriptor, G = (t, e, i, s) => {
-  for (var o = s > 1 ? void 0 : s ? Ns(e, i) : e, n = t.length - 1, a; n >= 0; n--)
+var Rs = Object.defineProperty, Fs = Object.getOwnPropertyDescriptor, G = (t, e, i, s) => {
+  for (var o = s > 1 ? void 0 : s ? Fs(e, i) : e, n = t.length - 1, a; n >= 0; n--)
     (a = t[n]) && (o = (s ? a(e, i, o) : a(o)) || o);
-  return s && o && Is(e, i, o), o;
+  return s && o && Rs(e, i, o), o;
 };
 class Ae extends oe {
   constructor() {
@@ -3680,10 +3703,10 @@ G([
 et = G([
   he("custom-buttons-editor")
 ], et);
-var Rs = Object.defineProperty, Fs = Object.getOwnPropertyDescriptor, ze = (t, e, i, s) => {
-  for (var o = s > 1 ? void 0 : s ? Fs(e, i) : e, n = t.length - 1, a; n >= 0; n--)
+var js = Object.defineProperty, Us = Object.getOwnPropertyDescriptor, ze = (t, e, i, s) => {
+  for (var o = s > 1 ? void 0 : s ? Us(e, i) : e, n = t.length - 1, a; n >= 0; n--)
     (a = t[n]) && (o = (s ? a(e, i, o) : a(o)) || o);
-  return s && o && Rs(e, i, o), o;
+  return s && o && js(e, i, o), o;
 };
 let xe = class extends oe {
   constructor() {
@@ -3957,10 +3980,10 @@ ze([
 xe = ze([
   he("item-editor")
 ], xe);
-var js = Object.defineProperty, Us = Object.getOwnPropertyDescriptor, re = (t, e, i, s) => {
-  for (var o = s > 1 ? void 0 : s ? Us(e, i) : e, n = t.length - 1, a; n >= 0; n--)
+var Vs = Object.defineProperty, Ks = Object.getOwnPropertyDescriptor, re = (t, e, i, s) => {
+  for (var o = s > 1 ? void 0 : s ? Ks(e, i) : e, n = t.length - 1, a; n >= 0; n--)
     (a = t[n]) && (o = (s ? a(e, i, o) : a(o)) || o);
-  return s && o && js(e, i, o), o;
+  return s && o && Vs(e, i, o), o;
 };
 let Y = class extends oe {
   constructor() {
@@ -4384,7 +4407,7 @@ let Y = class extends oe {
         l && this._updateEntityOptions();
       }
       if (!this._numericDeviceClasses) {
-        const { numeric_device_classes: i } = await fs(this.hass);
+        const { numeric_device_classes: i } = await vs(this.hass);
         this._numericDeviceClasses = i;
       }
     }
@@ -4722,7 +4745,7 @@ let Y = class extends oe {
 
       <ha-expansion-panel outlined class="main">
         <div slot="header" role="heading" aria-level="3">
-          <ha-svg-icon .path=${Es}></ha-svg-icon>
+          <ha-svg-icon .path=${Os}></ha-svg-icon>
           ${this.computeLabel({ name: "alert_classes" })}
         </div>
         <div class="content">
@@ -4746,7 +4769,7 @@ let Y = class extends oe {
 
       <ha-expansion-panel outlined class="main">
         <div slot="header" role="heading" aria-level="3">
-          <ha-svg-icon .path=${Ds}></ha-svg-icon>
+          <ha-svg-icon .path=${ks}></ha-svg-icon>
           ${this.computeLabel({ name: "cover_classes" })}
         </div>
         <div class="content">
@@ -4770,7 +4793,7 @@ let Y = class extends oe {
 
       <ha-expansion-panel outlined class="main">
         <div slot="header" role="heading" aria-level="3">
-          <ha-svg-icon .path=${Ss}></ha-svg-icon>
+          <ha-svg-icon .path=${Ds}></ha-svg-icon>
           ${this.computeLabel({ name: "sensor_classes" })}
         </div>
         <div class="content">
@@ -4794,7 +4817,7 @@ let Y = class extends oe {
 
       <ha-expansion-panel outlined class="main" .name="toggle_domains">
         <div slot="header" role="heading" aria-level="3">
-          <ha-svg-icon .path=${Os}></ha-svg-icon>
+          <ha-svg-icon .path=${Ms}></ha-svg-icon>
           ${this.computeLabel({ name: "toggle_domains" })}
         </div>
         <div class="content">
@@ -4818,7 +4841,7 @@ let Y = class extends oe {
 
       <ha-expansion-panel outlined class="main">
         <div slot="header" role="heading" aria-level="3">
-          <ha-svg-icon .path=${Ms}></ha-svg-icon>
+          <ha-svg-icon .path=${zs}></ha-svg-icon>
           Custom Buttons
         </div>
         <div class="content">
@@ -4834,7 +4857,7 @@ let Y = class extends oe {
 
       <ha-expansion-panel outlined class="main" .name="popup">
         <div slot="header" role="heading" aria-level="3">
-          <ha-svg-icon .path=${ks}></ha-svg-icon>
+          <ha-svg-icon .path=${Hs}></ha-svg-icon>
           ${this.computeLabel({ name: "popup" })}
         </div>
         <div class="content">
