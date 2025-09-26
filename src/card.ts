@@ -1795,9 +1795,11 @@ export class AreaCardPlus
       }
       .sensors {
         --mdc-icon-size: 20px;
+        color: var(--primary-text-color);
       }
       .sensor-value {
         vertical-align: middle;
+        color: var(--primary-text-color);
       }
       .sensor-row {
         display: flex;
@@ -1908,6 +1910,7 @@ export class AreaCardPlus
       .name {
         font-weight: bold;
         margin-bottom: 8px;
+        color: var(--primary-text-color);
       }
       .name.row {
         margin-bottom: 0;
@@ -1946,12 +1949,15 @@ export class AreaCardPlus
       }
       .text-small {
         font-size: 0.9em;
+        color: var(--primary-text-color);
       }
       .text-medium {
         font-size: 1em;
+        color: var(--primary-text-color);
       }
       .text-large {
         font-size: 1.3em;
+        color: var(--primary-text-color);
       }
       .right * {
         pointer-events: auto;
